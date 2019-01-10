@@ -2,7 +2,7 @@ const express 			= require('express');
 const router 			= express.Router();
 
 const UserController 	= require('../controllers/user.controller');
-const IntentController = require('../controllers/intent.controller');
+const ProjectController = require('../controllers/project.controller');
 const HomeController 	= require('../controllers/home.controller');
 const WorkController 	= require('../controllers/work.controller');
 
@@ -28,12 +28,13 @@ router.put(     '/users',           passport.authenticate('jwt', {session:false}
 router.delete(  '/users',           passport.authenticate('jwt', {session:false}), UserController.remove);     // D
 router.post(    '/users/login',     UserController.login);
 
-router.post(    '/intents',             passport.authenticate('jwt', {session:false}), IntentController.create);                  // C
-router.get(     '/intents',             passport.authenticate('jwt', {session:false}), IntentController.getAll);                  // R
+router.post(    '/projects',             passport.authenticate('jwt', {session:false}), custom.checkIfAdmin, ProjectController.create);                  // C
+router.post(    '/projects/add_users/:project_id', passport.authenticate('jwt', {session:false}), custom.checkIfAdmin, custom.project, custom.checkUsersExist, ProjectController.addUsersToProject);                  // C
+router.get(     '/projects',             passport.authenticate('jwt', {session:false}), custom.checkIfAdmin, ProjectController.getAll);                  // R
 
-router.get(     '/intents/:intent_id', passport.authenticate('jwt', {session:false}), custom.intent, IntentController.get);     // R
-router.put(     '/intents/:intent_id', passport.authenticate('jwt', {session:false}), custom.intent, IntentController.update);  // U
-router.delete(  '/intents/:intent_id', passport.authenticate('jwt', {session:false}), custom.intent, IntentController.remove);  // D
+router.get(     '/projects/:project_id', passport.authenticate('jwt', {session:false}), custom.checkIfAdmin, custom.project, ProjectController.get);     // R
+router.put(     '/projects/:project_id', passport.authenticate('jwt', {session:false}), custom.checkIfAdmin, custom.project, ProjectController.update);  // U
+router.delete(  '/projects/:project_id', passport.authenticate('jwt', {session:false}), custom.checkIfAdmin, custom.project, ProjectController.remove);  // D
 
 router.post(    '/works',             passport.authenticate('jwt', {session:false}), WorkController.create);                  // C
 router.get(     '/works',             passport.authenticate('jwt', {session:false}), WorkController.getAll);  

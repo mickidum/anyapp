@@ -1,4 +1,4 @@
-const { Intent, User }			    = require('../models');
+const { Intent, User, Project } = require('../models');
 const { to, ReE, ReS } = require('../services/util.service');
 
 let intent = async function (req, res, next) {
@@ -23,6 +23,26 @@ let intent = async function (req, res, next) {
 }
 module.exports.intent = intent;
 
+let project = async function (req, res, next) {
+    let project_id, err, project;
+    project_id = req.params.project_id;
+
+    [err, project] = await to(Project.findOne({_id:project_id}));
+    if(err) return ReE(res,"err finding project");
+
+    if(!project) return ReE(res, "Project not found with id: "+project_id);
+    // let user, users_array;
+    // user = req.user;
+    // users_array = project.users.map(obj=>String(obj.user));
+
+    // if(!users_array.includes(String(user._id))) return ReE(res, "User does not have permission to read app with id: "+user_id);
+
+    req.project = project;
+
+    next();
+}
+module.exports.project = project;
+
 let currentUser = async function (req, res, next) {
     let user_id, err, getCurrentUser;
     user_id = req.params.user_id;
@@ -38,4 +58,22 @@ let currentUser = async function (req, res, next) {
     next();
 }
 module.exports.currentUser = currentUser;
- 
+
+let checkIfAdmin = async function (req, res, next) {
+    let user_role = req.user.role || 'regular';
+    
+    if (user_role === 'admin') {
+        next();
+    } else {
+        ReE(res, "User does not have permission to access");
+    }
+}
+module.exports.checkIfAdmin = checkIfAdmin;
+
+let checkUsersExist = async function(req, res, next) {
+    // console.log(req.body);
+    let users = req.body;
+    req.body.users = users;
+    next();
+}
+module.exports.checkUsersExist = checkUsersExist;

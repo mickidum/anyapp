@@ -5,25 +5,19 @@ const create = async function(req, res){
     res.setHeader('Content-Type', 'application/json');
     let err, work, project;
     let user = req.user;
-
-    // console.log(user);
-
     let work_info = req.body;
 
-    // work_info.user = {
-    //     user_id: user._id,
-    //     name: user.name
-    // };
-    // work_info.project = {
-    //     id: 'dfdfdfd',
-    //     name: 'ffffff'
-    // };
-    console.log('work_info: ', work_info);
+    // console.log('work_info: ', work_info);
     // process.exit();
-    [err, work] = await to(Work.create(work_info));
-    if(err) return ReE(res, err, 422);
+    if (user.role === 'admin') {
+        [err, work] = await to(Work.create(work_info));
+        if(err) return ReE(res, err, 422);
 
-    return ReS(res,{work:work.toWeb()}, 201);
+        return ReS(res,{work:work.toWeb()}, 201);
+    } else {
+        ReE(res, 'You are not allowed to update this :) !');
+    }
+    
 }
 module.exports.create = create;
 

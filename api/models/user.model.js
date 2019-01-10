@@ -2,7 +2,7 @@ const mongoose 			= require('mongoose');
 const bcrypt 			= require('bcrypt');
 const bcrypt_p 			= require('bcrypt-promise');
 const jwt           	= require('jsonwebtoken');
-const { Intent, Work }  = require('../models');
+const { Project, Work, Intent }  = require('../models');
 const validate          = require('mongoose-validator');
 const {TE, to}          = require('../services/util.service');
 const CONFIG            = require('../config/config');
@@ -99,11 +99,11 @@ UserSchema.methods.comparePassword = async function(pw){
     return this;
 }
 
-UserSchema.methods.Intents = async function(){
-    let err, intents;
-    [err, intents] = await to(Intent.find({'users.user':this._id}));
-    if(err) TE('err getting intents');
-    return intents;
+UserSchema.methods.Projects = async function(){
+    let err, projects;
+    [err, projects] = await to(Project.find({'users.user':this._id}));
+    if(err) TE('err getting projects');
+    return projects;
 }
 
 UserSchema.methods.Works = async function(){
