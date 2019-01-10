@@ -70,10 +70,16 @@ let checkIfAdmin = async function (req, res, next) {
 }
 module.exports.checkIfAdmin = checkIfAdmin;
 
-let checkUsersExist = async function(req, res, next) {
-    // console.log(req.body);
-    let users = req.body;
-    req.body.users = users;
+let checkUsersExist = async function(req, res, next) {    
+    let users;
+    users = req.body;
+    if (Array.isArray(users) && users.length > 0) {
+        req.project.users = users; 
+    // console.log(req.project)
+    } else {
+        return ReE(res, "Wrong format of data inserted! error")
+    }
+    
     next();
 }
 module.exports.checkUsersExist = checkUsersExist;

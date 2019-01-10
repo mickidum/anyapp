@@ -63,15 +63,14 @@ const remove = async function(req, res){
 module.exports.remove = remove;
 
 const addUsersToProject = async function(req, res) {
-    let err, project, data, users;
+    let err, project;
     project = req.project;
-    data = req.body;
-    project.set(data);
-    console.log(project);
-    // [err, project] = await to(project.save());
-    // if(err){
-    //     return ReE(res, err);
-    // }
+    project.users = req.body;
+    // data = req.body;
+    // project.set(data);
+    // console.log(project);
+    [err, project] = await to(project.save());
+    if(err){return ReE(res, err);}
     return ReS(res, {message: `Project: ${project.name} - users have been added`});
 }
 module.exports.addUsersToProject = addUsersToProject;
