@@ -57,7 +57,8 @@ let UserSchema = mongoose.Schema({
         trim: true,
         required: true,
         minlength: 6
-    }
+    },
+    projects: [{ type: mongoose.Schema.ObjectId, ref: 'Project' }]
     
 }, {timestamps: true});
 

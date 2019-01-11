@@ -6,7 +6,7 @@ const create = async function(req, res){
     let err, project;
     let user = req.user;
     let project_info = req.body;
-
+    
     [err, project] = await to(Project.create(project_info));
     if(err) return ReE(res, err, 422);
 
@@ -18,7 +18,7 @@ const getAll = async function(req, res){
     res.setHeader('Content-Type', 'application/json');
     let user = req.user;
     let err, projects;
-    [err, projects] = await to(Project.find());
+    [err, projects] = await to(Project.find().populate('users', 'name'));
 
     let projects_json = []
     for (let i in projects){
@@ -30,7 +30,6 @@ const getAll = async function(req, res){
 module.exports.getAll = getAll;
 
 const get = function(req, res){
-    console.log(req.params);
     res.setHeader('Content-Type', 'application/json');
     let project = req.project;
     return ReS(res, {project:project.toWeb()});
@@ -63,14 +62,15 @@ const remove = async function(req, res){
 module.exports.remove = remove;
 
 const addUsersToProject = async function(req, res) {
-    let err, project;
+    let err, project, data;
     project = req.project;
-    project.users = req.body;
+    // project.users = req.body;
     // data = req.body;
     // project.set(data);
-    // console.log(project);
+    
     [err, project] = await to(project.save());
     if(err){return ReE(res, err);}
+    // console.log(project);
     return ReS(res, {message: `Project: ${project.name} - users have been added`});
 }
 module.exports.addUsersToProject = addUsersToProject;

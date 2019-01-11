@@ -20,16 +20,18 @@ router.get('/', function(req, res, next) {
 
 // ADMIN ACTIONS
 router.get(     '/usersall',           passport.authenticate('jwt', {session:false}), UserController.getAll);        // R
+router.get(     '/usersall/:user_id',  passport.authenticate('jwt', {session:false}), custom.currentUser, UserController.getSingleUser);        // R
 router.delete(  '/usersall/:user_id',  passport.authenticate('jwt', {session:false}), custom.currentUser, UserController.removeUser);     // D
 
 router.post(    '/users',           UserController.create);                                                    // C
 router.get(     '/users',           passport.authenticate('jwt', {session:false}), UserController.get);        // R
+// router.get(     '/users/projects',  passport.authenticate('jwt', {session:false}), UserController.getUserProjects);        // R
 router.put(     '/users',           passport.authenticate('jwt', {session:false}), UserController.update);     // U
 router.delete(  '/users',           passport.authenticate('jwt', {session:false}), UserController.remove);     // D
 router.post(    '/users/login',     UserController.login);
 
 router.post(    '/projects',             passport.authenticate('jwt', {session:false}), custom.checkIfAdmin, ProjectController.create);                  // C
-router.post(    '/projects/add_users/:project_id', passport.authenticate('jwt', {session:false}), custom.checkIfAdmin, custom.project, custom.checkUsersExist, ProjectController.addUsersToProject);                  // C
+router.post(    '/projects/add_users/:project_id', passport.authenticate('jwt', {session:false}), custom.checkIfAdmin, custom.project, custom.addUsersArray, ProjectController.addUsersToProject);                  // C
 router.get(     '/projects',             passport.authenticate('jwt', {session:false}), custom.checkIfAdmin, ProjectController.getAll);                  // R
 
 router.get(     '/projects/:project_id', passport.authenticate('jwt', {session:false}), custom.checkIfAdmin, custom.project, ProjectController.get);     // R

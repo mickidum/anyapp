@@ -1,17 +1,17 @@
 const mongoose = require('mongoose');
 const {TE, to} = require('../services/util.service');
 
-let UserSchema = mongoose.Schema({
-	name: {type: String, required: true, unique: true},
-	id: {type: mongoose.Schema.Types.ObjectId, unique: true}
-},{_id: false});
-
 let ProjectSchema = mongoose.Schema({
-    name: {type: String, required: true, trim: true},
-    hours: {type: Number, required: true},
+    name: {type: String, required: true, trim: true, unique: true},
+    hours: {
+        type: Number, 
+        required: true,
+        min: [10, 'Minimum 10 hours'],
+        max: [500, 'Maximum 500 hours']
+    },
     done: {type: Boolean, default: false},
     image: {type: String, trim: true},
-    users:  [ UserSchema ],
+    users:  [ {type : mongoose.Schema.ObjectId, ref : 'User'} ],
 }, {timestamps: true});
 
 ProjectSchema.methods.toWeb = function(){

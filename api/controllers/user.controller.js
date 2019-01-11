@@ -29,7 +29,7 @@ const getAll = async function(req, res){
         return ReE(res, 'You are not allowed to view this!');
     }
     
-    [err, users] = await to(User.find());
+    [err, users] = await to(User.find().populate('projects', 'name'));
     let users_json = []
     for (let i in users){
         let user = users[i];
@@ -40,6 +40,13 @@ const getAll = async function(req, res){
     // return ReS(res, {user:user.toWeb()});
 }
 module.exports.getAll = getAll;
+
+const getSingleUser = async function(req, res){
+    let currentUser;
+    currentUser = req.currentUser;
+    return ReS(res, {user:currentUser.toWeb()});
+}
+module.exports.getSingleUser = getSingleUser;
 
 const get = async function(req, res){
     res.setHeader('Content-Type', 'application/json');

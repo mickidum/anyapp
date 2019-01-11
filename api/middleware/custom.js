@@ -27,15 +27,10 @@ let project = async function (req, res, next) {
     let project_id, err, project;
     project_id = req.params.project_id;
 
-    [err, project] = await to(Project.findOne({_id:project_id}));
+    [err, project] = await to(Project.findOne({_id:project_id}).populate('users', 'name'));
     if(err) return ReE(res,"err finding project");
 
     if(!project) return ReE(res, "Project not found with id: "+project_id);
-    // let user, users_array;
-    // user = req.user;
-    // users_array = project.users.map(obj=>String(obj.user));
-
-    // if(!users_array.includes(String(user._id))) return ReE(res, "User does not have permission to read app with id: "+user_id);
 
     req.project = project;
 
@@ -48,7 +43,7 @@ let currentUser = async function (req, res, next) {
     user_id = req.params.user_id;
     // console.log(req.params);
 
-    [err, getCurrentUser] = await to(User.findOne({_id:user_id}));
+    [err, getCurrentUser] = await to(User.findOne({_id:user_id}).populate('projects', 'name'));
     if(err) return ReE(res,"err finding user");
 
     if(!getCurrentUser) return ReE(res, "User not found with id: "+intent_id);
@@ -83,3 +78,26 @@ let checkUsersExist = async function(req, res, next) {
     next();
 }
 module.exports.checkUsersExist = checkUsersExist;
+
+let addUsersArray = async function(req, res, next) {    
+    let users, project, err, getUser;
+    project = req.project;
+    users = req.body;
+    if (Array.isArray(users) && users.length > 0) {
+        users = [...new Set(users)]; // remove duplicates from input
+        users.forEach(async user_id => {
+            [err, getUser] = await to(User.findOne({_id:user_id}));
+            if(err) return ReE(res,"err finding user");
+            getUser.projects.addToSet(project._id);
+            getUser.save();
+        });
+        project.set({users: users})
+    } else {
+        return ReE(res, "Wrong format of data inserted! error")
+    }
+    console.log(users);
+    // console.log(project);
+    
+    next();
+}
+module.exports.addUsersArray = addUsersArray;
