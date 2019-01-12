@@ -60,8 +60,6 @@ const update = async function(req, res){
     let err, user, data
     user = req.user;
     data = req.body;
-    // console.log('User Role', user.role);
-    // console.log('Update Role', data.role);
     if(data.role) {
         ReE(res, 'You are not allowed to update this :) !');
     }
@@ -88,10 +86,10 @@ const update = async function(req, res){
 module.exports.update = update;
 
 const remove = async function(req, res){
-    let user, err, intents;
+    let user, err, works;
     user = req.user;
 
-    [err, intents] = await to(Intent.deleteMany({'users.user':user._id}, function (err) {
+    [err, works] = await to(Intent.deleteMany({'users.user':user._id}, function (err) {
         if (err) return res.status(500).send(err);
     }));
 
@@ -107,26 +105,53 @@ module.exports.remove = remove;
 const removeUser = async function(req, res){
     let user, err, currentUser;
     currentUser = req.currentUser;
-    user = req.user;
+    // user = req.user;
     // console.log('Admin: ', user);
     // console.log('Current User: ', currentUser)
-    if (user.role !== "admin") {
-        return ReE('You are not allowed to create an admin account.');
-    }
+    // if (user.role !== "admin") {
+    //     return ReE('You are not allowed to do this!.');
+    // }
 
-    [err, intents] = await to(Intent.deleteMany({'users.user':currentUser._id}, function (err) {
-        if (err) return res.status(500).send(err);
-    }));
+    // [err, intents] = await to(Intent.deleteMany({'users.user':currentUser._id}, function (err) {
+    //     if (err) return res.status(500).send(err);
+    // }));
 
-    if(err) return ReE(res, 'error occured trying to delete intents');
+    // if(err) return ReE(res, 'error occured trying to delete intents');
 
-    [err, intent] = await to(currentUser.remove());
+    [err, user] = await to(currentUser.remove());
     // [err, currentUser] = await console.log(currentUser);
     if(err) return ReE(res, 'error occured trying to delete user');
     
-    return ReS(res, {message:`User: ${currentUser.email} and all intents - have been deleted`});
+    return ReS(res, {message:`User: ${currentUser.email} and all work hours - have been deleted`});
 }
 module.exports.removeUser = removeUser;
+
+const updateUser = async function(req,res) {
+    let err, user, data;
+    user = req.currentUser;
+    data = req.body;
+    user.set(data);
+    // console.log(currentUser)
+    [err, user] = await to(user.save());
+    if(err){
+        console.log(err, user);
+
+        if(err.message.includes('E11000')){
+            if(err.message.includes('phone')){
+                err = 'This phone number is already in use';
+            } else if(err.message.includes('email')){
+                err = 'This email address is already in use';
+            }else{
+                err = 'Duplicate Key Entry';
+            }
+        }
+
+        return ReE(res, err);
+    }
+    return ReS(res, {message :'Updated User: '+user.email});
+
+}
+module.exports.updateUser = updateUser;
 
 
 const login = async function(req, res){

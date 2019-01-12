@@ -19,13 +19,16 @@ router.get('/', function(req, res, next) {
 });
 
 // ADMIN ACTIONS
-router.get(     '/usersall',           passport.authenticate('jwt', {session:false}), UserController.getAll);        // R
-router.get(     '/usersall/:user_id',  passport.authenticate('jwt', {session:false}), custom.currentUser, UserController.getSingleUser);        // R
-router.delete(  '/usersall/:user_id',  passport.authenticate('jwt', {session:false}), custom.currentUser, UserController.removeUser);     // D
+router.get(     '/usersall',           passport.authenticate('jwt', {session:false}),custom.checkIfAdmin, UserController.getAll);        // R
+router.post(    '/usersall/newuser',   passport.authenticate('jwt', {session:false}),custom.checkIfAdmin, UserController.create);        // R
+router.get(     '/usersall/:user_id',  passport.authenticate('jwt', {session:false}),custom.checkIfAdmin, custom.currentUser, UserController.getSingleUser);        // R
+router.put(     '/usersall/:user_id',  passport.authenticate('jwt', {session:false}),custom.checkIfAdmin, custom.currentUser, UserController.updateUser);     // D
+router.delete(  '/usersall/:user_id',  passport.authenticate('jwt', {session:false}),custom.checkIfAdmin, custom.currentUser, UserController.removeUser);     // D
 
+
+// USER ACTIONS
 router.post(    '/users',           UserController.create);                                                    // C
 router.get(     '/users',           passport.authenticate('jwt', {session:false}), UserController.get);        // R
-// router.get(     '/users/projects',  passport.authenticate('jwt', {session:false}), UserController.getUserProjects);        // R
 router.put(     '/users',           passport.authenticate('jwt', {session:false}), UserController.update);     // U
 router.delete(  '/users',           passport.authenticate('jwt', {session:false}), UserController.remove);     // D
 router.post(    '/users/login',     UserController.login);
